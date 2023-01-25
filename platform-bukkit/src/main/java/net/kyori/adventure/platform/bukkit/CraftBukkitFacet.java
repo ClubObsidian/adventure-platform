@@ -1194,7 +1194,7 @@ class CraftBukkitFacet<V extends CommandSender> extends FacetBase<V> {
         for (Player viewer : this.viewers) {
           this.teleport(viewer, this.createPosition(viewer));
         }
-      }, 1, 1);
+      }, 5, 5);
     }
 
     @Override
