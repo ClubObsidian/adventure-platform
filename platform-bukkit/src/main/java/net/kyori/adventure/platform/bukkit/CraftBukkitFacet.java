@@ -1174,6 +1174,7 @@ class CraftBukkitFacet<V extends CommandSender> extends FacetBase<V> {
           if (CLASS_CRAFT_ENTITY.isInstance(entity)) {
             handle = CRAFT_ENTITY_GET_HANDLE.invoke(entity);
           }
+          this.startFakeEntityTask(plugin);
         } catch (final Throwable error) {
           logError(error, "Failed to create fake entity: %s", entityClass.getSimpleName());
         }
@@ -1188,17 +1189,17 @@ class CraftBukkitFacet<V extends CommandSender> extends FacetBase<V> {
       }
     }
 
+    private void startFakeEntityTask(Plugin plugin) {
+      plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+        for (Player viewer : this.viewers) {
+          this.teleport(viewer, this.createPosition(viewer));
+        }
+      }, 1, 1);
+    }
+
     @Override
     public boolean isSupported() {
       return super.isSupported() && this.entity != null && this.entityHandle != null;
-    }
-
-    @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
-    public void onPlayerMove(final PlayerMoveEvent event) {
-      final Player viewer = event.getPlayer();
-      if (this.viewers.contains(viewer)) {
-        this.teleport(viewer, this.createPosition(viewer));
-      }
     }
 
     public @Nullable Object createSpawnPacket() {
